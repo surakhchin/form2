@@ -1,0 +1,223 @@
+<html>
+<head>
+
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+</head>
+
+<body>
+<table align="left" width="600px" border="0" cellpadding="5px">
+    <tr>
+        <td>
+        <form name="form1" id="form1">
+            <table border="0">
+                <tr>
+                    <td width="300px"><strong>Full Name: </strong></td>
+                    <td width="300px"><input type="text" name="txtName" value=" " size="20" /></td>
+                </tr>
+
+                <tr>
+                    <td><strong>City Name:</strong></td>
+                    <td>
+                        <div>
+                          <input  style="float: right; margin-left: 250px;" id="city">
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Nationality : </strong></td>
+                    <td>
+                        <div class="selDiv">
+                            <select class="opts" id="selNationality">
+                                <option  value="false">USA</option>
+                                <option  value="false">Canada</option>
+                                <option value="true">Mexico</option>
+                                <option  value="true">Germany</option>
+                                <option  value="true">France</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>City you wish to visit: </strong></td>
+                    <td><input type="radio" name="radCity" id="New" value="0" checked />New York City<br />
+                        <input type="radio" name="radCity" id="Bos" value="0" />Boston<br />
+                        <input type="radio" name="radCity" id="San" value="200" />San Francisco ($200 surcharge)<br />
+                        <input type="radio" name="radCity" id="Los" value="200" />Los Angeles ($200 surcharge)<br/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Number of days ($150 per day): </strong></td>
+                    <td><select name="selNumberDays" id="selNumberDays">
+                        <option value="450">3</option>
+                        <option value="600">4</option>
+                        <option value="750">5</option>
+                        <option value="900">6</option>
+                        <option value="1050">7</option>
+                        <option value="1350">8</option>
+                        <option value="1500">9</option>
+                        <option value="1650">10</option>
+                        <option value="1800">11</option>
+                        <option value="1950">12</option>
+                        <option value="2100">13</option>
+                        <option value="2250">14</option>
+                        <option value="2400">15</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Other options: </strong></td>
+                    <td>
+                        <input type="checkbox" name="chkFirst" id="chkFirst" />First Class Only ($500 surcharge)<br />
+                        <input type="checkbox" name="chkSpouse" id="chkSpouse" />Traveling with Spouse (Costs doubled)<br />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><input type="button" value="Check Passport" onClick="estimateCost();getPassport();"/></td>
+                    <td align="left"><input type="reset" /></td>
+                </tr>
+            </table>
+        </form>
+        </td>
+    </tr>
+
+</table> </br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>
+
+<div id="demo">Price</div>
+
+<script language="JavaScript">
+
+$(document).ready(function(){
+    $("#selNumberDays, #chkSpouse, #chkFirst, #Los, #San, #New, #Bos").click(function(){
+        estimateCost();
+    });
+
+
+
+});
+
+
+// getCityPrice() finds the price based on the city .
+// Here, we need to take user's the selection from radio button selection
+function getCityPrice(){
+var cityPrice = parseInt( $('input:radio[name="radCity"]:checked').val());
+return cityPrice;
+
+}
+
+
+//This function finds the day price based on the
+//drop down selection
+function getDayPrice()
+{
+    var dayPrice=parseInt(
+$( "#selNumberDays option:selected" ).val());
+    return dayPrice;
+}
+
+
+//chksFirst() finds the first class price based on a check box selection
+function chksFirst()
+{
+    var chkFirst=
+$('input:checkbox[name="chkFirst"]:checked').val();
+
+    if(chkFirst=="on")
+    {
+        chkFirst=500;
+    } else {
+        chkFirst = 0;
+    }
+    //finally we return the firstClass
+    return chkFirst;
+}
+
+//chksSpouse() finds the spouse price based on a check box selection
+function chksSpouse(totalPrice)
+{
+    var chkSpouse=
+$('input:checkbox[name="chkSpouse"]:checked').val();
+
+    //If they checked the box set Total 2x
+    if(chkSpouse=="on")
+    {
+        totalPrice= totalPrice*2;
+    }
+    //finally we return the firstClass
+    return totalPrice;
+}
+
+// getPassport() alerts if passport needed
+
+function getPassport() {
+    var ifPassport =
+$( "#selNationality option:selected" ).val();
+    if (ifPassport == "false") {
+        alert("no passport needed")
+
+    } else {
+        alert("need passport")
+    }
+
+}
+
+function estimateCost()
+{
+
+    //Here we get the estimate price by calling our function
+    //Each function returns a number so by calling them we add the values they return together
+    var preSpouseTotal = getCityPrice() + getDayPrice() + chksFirst();
+    var totalPrice = chksSpouse(preSpouseTotal);
+
+$("#demo").html(totalPrice);
+
+}
+
+
+</script>
+
+
+<script>
+$(function() {
+function log( message ) {
+  $( "<div>" ).text( message ).prependTo( "#log" );
+  $( "#log" ).scrollTop( 0 );
+}
+
+$( "#city" ).autocomplete({
+  source: function( request, response ) {
+    $.ajax({
+      url: "http://gd.geobytes.com/AutoCompleteCity",
+      dataType: "jsonp",
+      data: {
+        q: request.term
+      },
+      success: function( data ) {
+        response( data );
+      }
+    });
+  },
+  minLength: 3,
+  select: function( event, ui ) {
+    log( ui.item ?
+      "Selected: " + ui.item.label :
+      "Nothing selected, input was " + this.value);
+  },
+  open: function() {
+    $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+  },
+  close: function() {
+    $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+  }
+});
+});
+</script>
+</body>
+
+</html>
